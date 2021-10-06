@@ -25,10 +25,10 @@ def problemGen(a_arraySize, a_aveSize):
     l_items = [] #This value holds the sizes[] array at index 0 and values[] array at index 1
     l_sizes = []
     l_values = [] 
-    for i in range(0, arraySize):
+    for i in range(0, a_arraySize):
         #generate sizes
         l_sizes.append(random.randint(1, 2 * a_aveSize))
-        l_values.append(round(random.uniform(1.0, i + random.randint(1, 50))), 2)
+        l_values.append(round(random.uniform(1.0, i + random.randint(1, 50)), 2))
         
     l_items.append(l_sizes)
     l_items.append(l_values)
@@ -36,7 +36,21 @@ def problemGen(a_arraySize, a_aveSize):
 
 if __name__ == "__main__":
     print('Starting Program')
-    
+
+    #Loop through and try different cases
+    for i in range(0, 30):
+        l_items = problemGen(i, i)
+
+        print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes: {l_items[0]}\nvalues: {l_items[1]}')
+
+        start = time()
+        print(f"Value: {knapsacksValue(i, i, l_items[0], l_items[1])} calculated in {(time() - start):.4f} seconds")
+
+    print('Finished Program')
+
+
+    #Custom Problem Generator
+    '''
     #Create progressively larger and larger knapsacks and lists
     for i in range(0, 30):
         l_k1Size = i + random.randint(0, 3)
@@ -69,11 +83,12 @@ if __name__ == "__main__":
     #print(f'$$Max Value$$ : {knapsacksValue(l_k1Size, l_k2Size, l_sizes, l_values)}')
 
 
-    '''#Custom Cases
+    #Custom Cases
     l_k1Size = 1
     l_k2Size = 3
     l_sizes = [1, 2, 3]
     l_values = [10, 15, 30]
-    '''
+    
     #print(f'l_k1Size: {l_k1Size}\nl_k2Size: {l_k2Size}\nsizes: {len(l_sizes)}\nvalues: {len(l_values)}')
     #print(knapsacksValue(l_k1Size, l_k2Size, l_sizes, l_values))
+    '''
