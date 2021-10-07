@@ -1,25 +1,26 @@
 import random
 from time import time
 
-def knapsacksValue(a_k1Size, a_k2Size, a_sizes, a_values):
-    if a_k1Size == 0 and a_k2Size == 0:
+#global variables
+sizes = []
+values = []
+
+def maxValueRecursive(k1, k2, i):
+    if k1 == 0 and k2 == 0:
         return 0.0
-    if len(a_sizes) == 0:
+    if i-1 < 0:
         return 0.0
 
-    highestValue = 0
-    for i in range(0, len(a_sizes)):
-        if a_k1Size >= a_sizes[i]:
-            value = knapsacksValue(a_k1Size - a_sizes[i], a_k2Size, a_sizes, a_values) + a_values[i]
-
-            if value > highestValue:
-                highestValue = value
-        elif a_k2Size >= a_sizes[i]:
-            value = knapsacksValue(a_k1Size, a_k2Size - a_sizes[i], a_sizes, a_values) + a_values[i]
-
-            if value > highestValue:
-                highestValue = value
-    return highestValue
+    value1 = 0.0
+    value2 = 0.0
+    value3 = 0.0
+    if k1 - sizes[i - 1] >= 0:
+        value1 = maxValueRecursive(k1 - sizes[i - 1], k2, i - 1) + values[i - 1]
+    if k2 - sizes[i - 1] >= 0:
+        value2 = maxValueRecursive(k1, k2 - sizes[i - 1], i - 1) + values[i - 1]
+    value3 = maxValueRecursive(k1, k2, i - 1)
+    
+    return max(value1, value2, value3)
 
 def problemGen(a_arraySize, a_aveSize):
     l_items = [] #This value holds the sizes[] array at index 0 and values[] array at index 1
@@ -27,7 +28,8 @@ def problemGen(a_arraySize, a_aveSize):
     l_values = [] 
     for i in range(0, a_arraySize):
         #generate sizes
-        l_sizes.append(random.randint(1, 2 * a_aveSize))
+        #l_sizes.append(random.randint(1, 2 * a_aveSize))
+        l_sizes.append(random.randint(1, 5))
         l_values.append(round(random.uniform(1.0, i + random.randint(1, 50)), 2))
         
     l_items.append(l_sizes)
@@ -37,16 +39,37 @@ def problemGen(a_arraySize, a_aveSize):
 if __name__ == "__main__":
     print('Starting Program')
 
-    #Loop through and try different cases
-    for i in range(0, 30):
+    print('\nStarting Recursion...')
+    numRecursiveCalls = 30
+    startRecursion = time()
+    #Recursive Calls to find solution to knapsack problem
+    for i in range(0, numRecursiveCalls):
         l_items = problemGen(i, i)
+        sizes = l_items[0]
+        values = l_items[1]
 
         print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes: {l_items[0]}\nvalues: {l_items[1]}')
 
-        start = time()
-        print(f"Value: {knapsacksValue(i, i, l_items[0], l_items[1])} calculated in {(time() - start):.4f} seconds")
+        startCall = time()
+        print(f"Value: {maxValueRecursive(i, i, len(l_items[0]))} calculated in {(time() - startCall):.4f} seconds")
+    print(f'\n\nEnding Recursion\nTotal Recursive time to run through {numRecursiveCalls} calls: {time() - startRecursion}\n\n')
+
+    
 
     print('Finished Program')
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     #Custom Problem Generator
