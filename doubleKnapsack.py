@@ -7,20 +7,20 @@ values = []
 
 memoizingCache = []
 
-def maxValueRecursive(k1, k2, i):
+def maxValueRecursive(k1, k2, sizeOfArray):
     if k1 == 0 and k2 == 0:
         return 0.0
-    if i-1 < 0:
+    if sizeOfArray-1 < 0:
         return 0.0
 
     value1 = 0.0
     value2 = 0.0
     value3 = 0.0
-    if k1 - sizes[i - 1] >= 0:
-        value1 = maxValueRecursive(k1 - sizes[i - 1], k2, i - 1) + values[i - 1]
-    if k2 - sizes[i - 1] >= 0:
-        value2 = maxValueRecursive(k1, k2 - sizes[i - 1], i - 1) + values[i - 1]
-    value3 = maxValueRecursive(k1, k2, i - 1)
+    if k1 - sizes[sizeOfArray - 1] >= 0:
+        value1 = maxValueRecursive(k1 - sizes[sizeOfArray - 1], k2, sizeOfArray - 1) + values[sizeOfArray - 1]
+    if k2 - sizes[sizeOfArray - 1] >= 0:
+        value2 = maxValueRecursive(k1, k2 - sizes[sizeOfArray - 1], sizeOfArray - 1) + values[sizeOfArray - 1]
+    value3 = maxValueRecursive(k1, k2, sizeOfArray - 1)
     
     return max(value1, value2, value3)
 
@@ -47,8 +47,23 @@ def maxValueMemoizing(k1, k2, i):
     
     return memoizingCache[k1][k2][i]
 
-def maxValueDP(k1, k2, i):
-    return 0.0
+def maxValueDP(k1, k2, sizeOfArray):
+    dpCache = [[[-1.0 for j in range(sizeOfArray + 1)] for k in range(k1 + 1)] for z in range(k2 + 1)]
+
+    for i in range(sizeOfArray):
+        dpCache[0][0][i] = 0.0
+
+    for i in range(sizeOfArray):
+        for k1Space in range(k1):
+            for k2Space in range(k2):
+                value1 = 0.0
+                value2 = 0.0
+                value3 = 0.0
+
+                if k1Space - sizes[i] >= 0:
+                    value1 = values[i] + dpCache[i - 1][k1Space - sizes[i]][k2Space]
+                if k2Space - sizes[i] >= 0:
+                    
 
 def problemGen(a_arraySize, a_aveSize):
     l_items = [] #This value holds the sizes[] array at index 0 and values[] array at index 1
