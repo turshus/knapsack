@@ -84,62 +84,66 @@ def problemGen(a_arraySize, a_aveSize):
         l_sizes.append(random.randint(1, 2 * a_aveSize))
         l_values.append(round(random.uniform(1.0, i + random.randint(1, 50)), 2))
         
+    #adds a None at the start of the array
+    l_sizes = [None] + l_sizes 
+    l_values = [None] + l_values
+
     l_items.append(l_sizes)
     l_items.append(l_values)
     return l_items
 
 if __name__ == "__main__":
-    # print('Starting Program')
+    print('Starting Program')
 
-    # print('\nStarting Recursion...')
-    # numRecursiveCalls = 30
-    # startRecursion = time()
-    # #Recursive Calls to find solution to knapsack problem
-    # for i in range(0, numRecursiveCalls):
-    #     l_items = problemGen(i, i)
-    #     sizes = l_items[0]
-    #     values = l_items[1]
+    print('\nStarting Recursion...')
+    numRecursiveCalls = 30
+    startRecursion = time()
+    #Recursive Calls to find solution to knapsack problem
+    for i in range(0, numRecursiveCalls):
+        l_items = problemGen(i, i)
+        sizes = l_items[0]
+        values = l_items[1]
 
-    #     print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes: {l_items[0]}\nvalues: {l_items[1]}')
+        print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes:  {sizes}\nvalues: {values}')
 
-    #     startCall = time()
-    #     print(f"Value: {maxValueRecursive(i, i, len(l_items[0]))} calculated in {(time() - startCall):.4f} seconds")
-    # print(f'\n\nEnding Recursion\nTotal Recursive time to run through {numRecursiveCalls} calls: {(time() - startRecursion):.4f}\n\n')
+        startCall = time()
+        print(f"Value: {maxValueRecursive(i, i, len(sizes) - 1)} calculated in {(time() - startCall):.4f} seconds")
+    print(f'\n\nEnding Recursion\nTotal Recursive time to run through {numRecursiveCalls} calls: {(time() - startRecursion):.4f}\n\n')
 
-    # print('Starting Memoizing...')
-    # knapsackSize = 30
-    # startMemoizing = time()
+    print('Starting Memoizing...')
+    knapsackSize = 30
+    startMemoizing = time()
 
-    # for i in range(0, knapsackSize):
-    #     l_items = problemGen(i, i)
-    #     sizes = l_items[0]
-    #     values = l_items[1]
+    for i in range(0, knapsackSize):
+        l_items = problemGen(i, i)
+        sizes = l_items[0]
+        values = l_items[1]
 
-    #     #Clear the cache for the new round
-    #     memoizingCache = [[[-1 for j in range(len(l_items[0]) + 1)] for k in range(i + 1)] for z in range(i + 1)]
+        #Clear the cache for the new round
+        memoizingCache = [[[-1 for j in range(len(l_items[0]) + 1)] for k in range(i + 1)] for z in range(i + 1)]
 
-    #     print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes: {l_items[0]}\nvalues: {l_items[1]}')
+        print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes: {sizes}\nvalues: {values}')
 
-    #     startCall = time()
-    #     print(f'Value: {maxValueMemoizing(i, i, len(l_items[0]))} calculated in {(time() - startCall):.4f} seconds')    
-    # print(f'\n\nEnding Memoizing\nTotal Memoizing time to run through {knapsackSize} calls: {(time() - startMemoizing):.4f} seconds\n\n')
+        startCall = time()
+        print(f'Value: {maxValueMemoizing(i, i, len(sizes) - 1)} calculated in {(time() - startCall):.4f} seconds')    
+    print(f'\n\nEnding Memoizing\nTotal Memoizing time to run through {knapsackSize} calls: {(time() - startMemoizing):.4f} seconds\n\n')
 
-    # print('Starting DP...')
-    # numDPCalls = 30
-    # startDP = time()
+    print('Starting DP...')
+    numDPCalls = 30
+    startDP = time()
 
-    # for i in range(0, numDPCalls):
-    #     l_items = problemGen(i, i)
-    #     sizes = l_items[0]
-    #     values = l_items[1]
+    for i in range(0, numDPCalls):
+        l_items = problemGen(i, i)
+        sizes = l_items[0]
+        values = l_items[1]
 
-    #     print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes: {l_items[0]}\nvalues: {l_items[1]}')
+        print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes: {sizes}\nvalues: {values}')
 
-    #     startCall = time()
-    #     print(f'Value: {maxValueDP(len(l_items[0]), i, i)} calculated in {(time() - startCall):.4f} seconds')    
-    # print(f'\n\nEnding DP\nTotal DP time to run through {numDPCalls} calls: {(time() - startDP):.4f} seconds\n\n')
+        startCall = time()
+        print(f'Value: {maxValueDP(i, i, len(sizes) - 1)} calculated in {(time() - startCall):.4f} seconds')    
+    print(f'\n\nEnding DP\nTotal DP time to run through {numDPCalls} calls: {(time() - startDP):.4f} seconds\n\n')
 
-
+    print('\n\nSTARTING PREDICTABLE PROBLEM... ANSWER SHOULD BE 19\n\n')
 
     #Simple, predictable problem
     sizes = [None, 3, 2, 3, 2, 1, 5]
