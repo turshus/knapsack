@@ -1,25 +1,79 @@
 import random
 from time import time
 
-def knapsacksValue(a_k1Size, a_k2Size, a_sizes, a_values):
-    if a_k1Size == 0 and a_k2Size == 0:
+#global variables
+sizes = []
+values = []
+
+memoizingCache = []
+
+def maxValueRecursive(k1, k2, numObj):
+    if k1 == 0 and k2 == 0:
         return 0.0
-    if len(a_sizes) == 0:
+    if numObj == 0:
         return 0.0
 
-    highestValue = 0
-    for i in range(0, len(a_sizes)):
-        if a_k1Size >= a_sizes[i]:
-            value = knapsacksValue(a_k1Size - a_sizes[i], a_k2Size, a_sizes, a_values) + a_values[i]
+    value1 = 0.0 #Knapsack 1 value
+    value2 = 0.0 #knapsack 2 value
+    value3 = 0.0 #knapsack 3 value
+    if k1 - sizes[numObj] >= 0:
+        value1 = maxValueRecursive(k1 - sizes[numObj], k2, numObj - 1) + values[numObj]
+    if k2 - sizes[numObj] >= 0:
+        value2 = maxValueRecursive(k1, k2 - sizes[numObj], numObj - 1) + values[numObj]
+    value3 = maxValueRecursive(k1, k2, numObj - 1)
+    
+    return max(value1, value2, value3)
 
-            if value > highestValue:
-                highestValue = value
-        elif a_k2Size >= a_sizes[i]:
-            value = knapsacksValue(a_k1Size, a_k2Size - a_sizes[i], a_sizes, a_values) + a_values[i]
+def maxValueMemoizing(k1, k2, numObj):
+    if k1 == 0 and k2 == 0:
+        return 0.0
+    if numObj == 0:
+        return 0.0
+    
+    #check if solution as already been solved
+    if(k1, k2, numObj) in memoizingCache:
+        return memoizingCache[k2][k1][numObj]
+    
+    value1 = 0.0
+    value2 = 0.0
+    value3 = 0.0
+    if k1 - sizes[numObj] >= 0:
+        value1 = maxValueMemoizing(k1 - sizes[numObj], k2, numObj - 1) + values[numObj]
+    if k2 - sizes[numObj] >= 0:
+        value2 = maxValueMemoizing(k1, k2 - sizes[numObj], numObj - 1) + values[numObj]
+    value3 = maxValueMemoizing(k1, k2, numObj - 1)
 
-            if value > highestValue:
-                highestValue = value
-    return highestValue
+    memoizingCache[k2][k1][numObj] = max(value1, value2, value3)
+
+    return memoizingCache[k2][k1][numObj]
+
+def maxValueDP(k1, k2, totNumObj):
+    dpCache = [[[-1.0 for j in range(totNumObj + 1)] for k in range(k1 + 1)] for z in range(k2 + 1)]
+    #[k2][k1][totNumObj]
+    #Base case
+    for currNumObj in range(totNumObj):
+        dpCache[0][0][currNumObj] = 0.0
+
+    for i in range(k1 + 1):
+        for j in range(k2 + 1):
+            dpCache[j][i][0] = 0.0
+
+    for currNumObj in range(1, totNumObj + 1):
+        for k2Spaces in range(0, k2 + 1):
+            for k1Space in range(0, k1 + 1):
+                value1 = 0.0
+                value2 = 0.0
+                value3 = 0.0
+                if not (k2Spaces == 0 and k1Space == 0):
+                    if k1Space - sizes[currNumObj] >= 0:
+                        value1 = values[currNumObj] + dpCache[k2Spaces][k1Space - sizes[currNumObj]][currNumObj - 1]
+                    if k2Spaces - sizes[currNumObj] >= 0:
+                        value2 = values[currNumObj] + dpCache[k2Spaces - sizes[currNumObj]][k1Space][currNumObj - 1]
+                    value3 = dpCache[k2Spaces][k1Space][totNumObj - 1]
+
+                    dpCache[k2Spaces][k1Space][currNumObj] = max(value1, value2, value3)
+
+    return dpCache[k2][k1][totNumObj - 1]
 
 def problemGen(a_arraySize, a_aveSize):
     l_items = [] #This value holds the sizes[] array at index 0 and values[] array at index 1
@@ -30,6 +84,10 @@ def problemGen(a_arraySize, a_aveSize):
         l_sizes.append(random.randint(1, 2 * a_aveSize))
         l_values.append(round(random.uniform(1.0, i + random.randint(1, 50)), 2))
         
+    #adds a None at the start of the array
+    l_sizes = [None] + l_sizes 
+    l_values = [None] + l_values
+
     l_items.append(l_sizes)
     l_items.append(l_values)
     return l_items
@@ -37,58 +95,67 @@ def problemGen(a_arraySize, a_aveSize):
 if __name__ == "__main__":
     print('Starting Program')
 
-    #Loop through and try different cases
-    for i in range(0, 30):
+    print('\nStarting Recursion...')
+    numRecursiveCalls = 30
+    startRecursion = time()
+    #Recursive Calls to find solution to knapsack problem
+    for i in range(0, numRecursiveCalls):
         l_items = problemGen(i, i)
+        sizes = l_items[0]
+        values = l_items[1]
 
-        print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes: {l_items[0]}\nvalues: {l_items[1]}')
+        print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes:  {sizes}\nvalues: {values}')
 
-        start = time()
-        print(f"Value: {knapsacksValue(i, i, l_items[0], l_items[1])} calculated in {(time() - start):.4f} seconds")
+        startCall = time()
+        print(f"Value: {maxValueRecursive(i, i, len(sizes) - 1)} calculated in {(time() - startCall):.4f} seconds")
+    print(f'\n\nEnding Recursion\nTotal Recursive time to run through {numRecursiveCalls} calls: {(time() - startRecursion):.4f}\n\n')
 
-    print('Finished Program')
+    print('Starting Memoizing...')
+    knapsackSize = 30
+    startMemoizing = time()
 
+    for i in range(0, knapsackSize):
+        l_items = problemGen(i, i)
+        sizes = l_items[0]
+        values = l_items[1]
 
-    #Custom Problem Generator
-    '''
-    #Create progressively larger and larger knapsacks and lists
-    for i in range(0, 30):
-        l_k1Size = i + random.randint(0, 3)
-        l_k2Size = i + random.randint(0, 3)
+        #Clear the cache for the new round
+        memoizingCache = [[[-1 for j in range(len(l_items[0]) + 1)] for k in range(i + 1)] for z in range(i + 1)]
 
-        l_sizes = []
-        l_values = []
+        print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes: {sizes}\nvalues: {values}')
 
-        #fill out the sizes and values
-        for j in range(0, i + random.randint(0, 3)):
-            l_sizes.append(j + random.randint(1, 4))
-            l_values.append(j + round(random.uniform(0.0, i + 5.0), 2))
-        
-        
-        print(f'\n\nROUND {i}\nk1: {l_k1Size}\nk2: {l_k2Size}\nsizes:  ({len(l_sizes)}) | {l_sizes}\nvalues: ({len(l_sizes)}) | {l_values}')
-        start = time()
-        print(f'$$Max Value$$ : {knapsacksValue(l_k1Size, l_k2Size, l_sizes, l_values)} in {(time() - start):.4f} seconds')
+        startCall = time()
+        print(f'Value: {maxValueMemoizing(i, i, len(sizes) - 1)} calculated in {(time() - startCall):.4f} seconds')    
+    print(f'\n\nEnding Memoizing\nTotal Memoizing time to run through {knapsackSize} calls: {(time() - startMemoizing):.4f} seconds\n\n')
 
-    #Create random knapsack sizes and random values & sizes arrays
-   # l_k1Size = random.randint(1, 10)
-    #l_k2Size = random.randint(1, 10)
-    #l_sizes = []
-    #l_values = []
+    print('Starting DP...')
+    numDPCalls = 30
+    startDP = time()
 
-    #for i in range(1, random.randint(2, 25)):
-    #    l_sizes.append(i + random.randint(0, 4))
-    #    l_values.append(i + round(random.uniform(0.0, 10.0), 2))
+    for i in range(0, numDPCalls):
+        l_items = problemGen(i, i)
+        sizes = l_items[0]
+        values = l_items[1]
 
-    #print(f'\n\nROUND {i}\nk1: {l_k1Size}\nk2: {l_k2Size}\nsizes: ({len(l_sizes)}) | {l_sizes}\nvalues: ({len(l_sizes)}) | {l_values}')
-    #print(f'$$Max Value$$ : {knapsacksValue(l_k1Size, l_k2Size, l_sizes, l_values)}')
+        print(f'\n\nROUND {i}\nk1: {i}\nk2: {i}\nsizes: {sizes}\nvalues: {values}')
 
+        startCall = time()
+        print(f'Value: {maxValueDP(i, i, len(sizes) - 1)} calculated in {(time() - startCall):.4f} seconds')    
+    print(f'\n\nEnding DP\nTotal DP time to run through {numDPCalls} calls: {(time() - startDP):.4f} seconds\n\n')
 
-    #Custom Cases
-    l_k1Size = 1
-    l_k2Size = 3
-    l_sizes = [1, 2, 3]
-    l_values = [10, 15, 30]
-    
-    #print(f'l_k1Size: {l_k1Size}\nl_k2Size: {l_k2Size}\nsizes: {len(l_sizes)}\nvalues: {len(l_values)}')
-    #print(knapsacksValue(l_k1Size, l_k2Size, l_sizes, l_values))
-    '''
+    print('\n\nSTARTING PREDICTABLE PROBLEM... ANSWER SHOULD BE 19\n\n')
+
+    #Simple, predictable problem
+    sizes = [None, 3, 2, 3, 2, 1, 5]
+    values = [None, 2, 3, 5, 3, 6, 3]
+    k1 = 7
+    k2 = 4
+
+    memoizingCache = [[[-1 for j in range(len(sizes) + 1)] for k in range(k1 + 1)] for z in range(k2 + 1)]
+
+    print(f"Recursive: {maxValueRecursive(k1, k2, len(sizes) - 1)}")
+    print(f"Memoizing: {maxValueMemoizing(k1, k2, len(sizes) - 1)}")
+    print(f"DP: {maxValueDP(k1, k2, len(sizes) - 1)}")
+
+    print('\n##########################################\n            Finished Program')
+    print('##########################################')
